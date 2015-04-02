@@ -9,7 +9,14 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var rpc = require('json-rpc2');
-var kodi = rpc.Client.$create(8080, 'localhost', 'kodi', 'kodi');
+
+// Get all conecction infos from Environment variables
+var kodiPort = process.env.KODI_PORT || 8080,
+    kodiIP   = process.env.KODI_IP   || '127.0.0.1',
+    kodiUser = process.env.KODI_USER || 'kodi',
+    kodiPwd  = process.env.KODI_PWD  || 'kodi';
+
+var kodi = rpc.Client.$create(kodiPort, kodiIP, kodiUser, kodiPwd);
 
 var app = express();
 
