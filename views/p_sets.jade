@@ -1,0 +1,11 @@
+p Filter:
+  input(ng-model='query')
+
+ul
+  li(ng-repeat='set in sets | filter:query | orderBy:"label"')
+    img(style="max-width:92px;",ng-src="{{ ( ( set.art.thumb || set.thumbnail) | kodiImageToUrl) ||'defaultUrl' }}")
+    a(ng-href='sets/{{set.setid}}') {{set.label}} ({{set.setid}})
+
+hr
+
+pre {{ sets | json }}

@@ -5,12 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var rpc = require('json-rpc2');
 
-// Get all conecction infos from Environment variables
+// Get all connection info from Environment variables
 var kodiPort = process.env.KODI_PORT || 8080,
     kodiIP   = process.env.KODI_IP   || '127.0.0.1',
     kodiUser = process.env.KODI_USER || 'kodi',
@@ -32,22 +29,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+app.use(function(req,res,next) {
+  console.log(req.originalUrl);
+  next();
+});
 
 app.get('/rest/sets', function(req,res) {
   kodi.call('VideoLibrary.GetMovieSets', {
-  }, { 'path': '/jsonrpc' }, function(err, result) {
+    properties: ['art', 'thumbnail']
+  }, { path: '/jsonrpc' }, function(err, result) {
     res.send(result.sets);
     res.end();
   })
 });
 
 app.get('/rest/sets/:id', function(req,res) {
-  console.log(req.params.id);
   kodi.call('VideoLibrary.GetMovieSetDetails', {
-    'setid': parseInt(req.params.id),
-    'movies': { 'properties': [ 'sorttitle', 'year' ] }
+    setid: parseInt(req.params.id),
+    movies: { properties: ['sorttitle', 'year', 'art', 'thumbnail'] }
   }, { 'path': '/jsonrpc' }, function(err, result) {
     setDetails = result.setdetails;
     delete setDetails.limits;
@@ -58,19 +57,18 @@ app.get('/rest/sets/:id', function(req,res) {
 
 app.get('/rest/movies', function(req,res) {
   kodi.call('VideoLibrary.GetMovies', {
-    'properties': [ 'sorttitle', 'year' ]
-  }, { 'path': '/jsonrpc' }, function(err, result) {
+    properties: [ 'sorttitle', 'year' ]
+  }, { path: '/jsonrpc' }, function(err, result) {
     res.send(result.movies);
     res.end();
   })
 });
 
 app.get('/rest/movies/:id', function(req,res) {
-  console.log(req.params.id);
   kodi.call('VideoLibrary.GetMovieDetails', {
-    'movieid': parseInt(req.params.id),
-    'properties': [ 'sorttitle', 'year', 'set', 'file', 'setid' ]
-  }, { 'path': '/jsonrpc' }, function(err, result) {
+    movieid: parseInt(req.params.id),
+    properties: [ 'sorttitle', 'year', 'set', 'file', 'setid' ]
+  }, { path: '/jsonrpc' }, function(err, result) {
     movieDetails = result.moviedetails;
     delete movieDetails.limits;
     res.send(movieDetails);
@@ -79,6 +77,27 @@ app.get('/rest/movies/:id', function(req,res) {
 });
 
 
+app.get('/rest/movies/search/:query', function(req,res) {
+  kodi.call('VideoLibrary.GetMovies', {
+    filter: {
+      field: 'title', operator: 'contains', value: req.params.query
+    },
+    properties: [ 'sorttitle', 'year', 'set', 'file', 'setid', 'thumbnail', 'art' ]
+  }, { path: '/jsonrpc' }, function(err, result) {
+    res.send(result.movies);
+    res.end();
+  })
+});
+
+
+
+app.get('/view/:name', function(req,res) {
+  res.render(req.params.name);
+});
+
+app.get('/*', function(req,res) {
+  res.render('index');
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
