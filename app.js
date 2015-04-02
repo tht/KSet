@@ -11,11 +11,6 @@ var users = require('./routes/users');
 var rpc = require('json-rpc2');
 var kodi = rpc.Client.$create(8080, 'localhost', 'kodi', 'kodi');
 
-kodi.call('VideoLibrary.GetMovieSets', { }, { 'path': '/jsonrpc' }, function(err, result) {
-  console.log(err);
-  console.log(result);
-})
-
 var app = express();
 
 // view engine setup
@@ -32,6 +27,51 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+
+app.get('/rest/sets', function(req,res) {
+  kodi.call('VideoLibrary.GetMovieSets', {
+  }, { 'path': '/jsonrpc' }, function(err, result) {
+    res.send(result.sets);
+    res.end();
+  })
+});
+
+app.get('/rest/sets/:id', function(req,res) {
+  console.log(req.params.id);
+  kodi.call('VideoLibrary.GetMovieSetDetails', {
+    'setid': parseInt(req.params.id),
+    'movies': { 'properties': [ 'sorttitle', 'year' ] }
+  }, { 'path': '/jsonrpc' }, function(err, result) {
+    setDetails = result.setdetails;
+    delete setDetails.limits;
+    res.send(setDetails);
+    res.end();
+  })
+});
+
+app.get('/rest/movies', function(req,res) {
+  kodi.call('VideoLibrary.GetMovies', {
+    'properties': [ 'sorttitle', 'year' ]
+  }, { 'path': '/jsonrpc' }, function(err, result) {
+    res.send(result.movies);
+    res.end();
+  })
+});
+
+app.get('/rest/movies/:id', function(req,res) {
+  console.log(req.params.id);
+  kodi.call('VideoLibrary.GetMovieDetails', {
+    'movieid': parseInt(req.params.id),
+    'properties': [ 'sorttitle', 'year', 'set', 'file', 'setid' ]
+  }, { 'path': '/jsonrpc' }, function(err, result) {
+    movieDetails = result.moviedetails;
+    delete movieDetails.limits;
+    res.send(movieDetails);
+    res.end();
+  })
+});
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
