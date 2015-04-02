@@ -3,7 +3,7 @@ a(href="/") Back to Sets...
 hr
 
 ul
-  li(ng-repeat='movie in set.movies | orderBy:movieSort')
+  li(ng-repeat='movie in set.movies')
     img(style="max-width:92px;",ng-src="{{ (movie.thumbnail | kodiImageToUrl) ||'defaultUrl' }}")
     | {{movie.label}} ({{movie.year}})
 

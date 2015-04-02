@@ -9,8 +9,5 @@ kSetControllers.controller('SetListCtrl', ['$scope', 'Set', function ($scope, Se
 }]);
 
 kSetControllers.controller('SetEditCtrl', ['$scope', 'Set', '$routeParams', function ($scope, Set, $routeParams) {
-    $scope.movieSort = function(movie) {
-        return (movie.sorttitle ? movie.sorttitle : movie.label );
-    }
     $scope.set = Set.get({setId: parseInt($routeParams.setId) });
 }]);

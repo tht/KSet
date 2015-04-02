@@ -36,7 +36,8 @@ app.use(function(req,res,next) {
 
 app.get('/rest/sets', function(req,res) {
   kodi.call('VideoLibrary.GetMovieSets', {
-    properties: ['art', 'thumbnail']
+    properties: ['art', 'thumbnail'],
+    sort: { method: 'label', ignorearticle: true }
   }, { path: '/jsonrpc' }, function(err, result) {
     res.send(result.sets);
     res.end();
@@ -46,7 +47,9 @@ app.get('/rest/sets', function(req,res) {
 app.get('/rest/sets/:id', function(req,res) {
   kodi.call('VideoLibrary.GetMovieSetDetails', {
     setid: parseInt(req.params.id),
-    movies: { properties: ['sorttitle', 'year', 'art', 'thumbnail'] }
+    movies: { properties: ['sorttitle', 'year', 'art', 'thumbnail'],
+      sort: { method: 'sorttitle', ignorearticle: true }
+    }
   }, { 'path': '/jsonrpc' }, function(err, result) {
     setDetails = result.setdetails;
     delete setDetails.limits;
