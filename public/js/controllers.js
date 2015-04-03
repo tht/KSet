@@ -8,6 +8,14 @@ kSetControllers.controller('SetListCtrl', ['$scope', 'Set', function ($scope, Se
     $scope.sets = Set.query();
 }]);
 
-kSetControllers.controller('SetEditCtrl', ['$scope', 'Set', '$routeParams', function ($scope, Set, $routeParams) {
+kSetControllers.controller('SetEditCtrl', ['$scope', 'Set', '$routeParams', '$http', function ($scope, Set, $routeParams, $http) {
     $scope.set = Set.get({setId: parseInt($routeParams.setId) });
+
+    $scope.removeSet = function() {
+        $scope.set.movies.forEach(function (movie) {
+            $http.post('/rest/movies/' + movie.movieid, {
+                set: ''
+            });
+        });
+    }
 }]);

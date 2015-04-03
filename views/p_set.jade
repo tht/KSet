@@ -1,11 +1,21 @@
-a(href="/") Back to Sets...
+ol.breadcrumb
+  li
+    a(href='/') Sets
+  li.active Details
 
-hr
+.btn-group
+  button.btn.btn-danger(ng-click="removeSet()") Remove Set
 
-ul
-  li(ng-repeat='movie in set.movies')
-    img(style="max-width:92px;",ng-src="{{ (movie.thumbnail | kodiImageToUrl) ||'defaultUrl' }}")
-    | {{movie.label}} ({{movie.year}})
+.media(ng-repeat='movie in set.movies')
+  .media-left
+    img.media-object(style="max-width:92px;",ng-src="{{ (movie.thumbnail | kodiImageToUrl) ||'defaultUrl' }}")
+  .media-body
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title {{movie.label}} ({{movie.year}})
+          .pull-right ({{movie.movieid}})
+      .panel-body
+        i {{movie.sorttitle || 'no sorttitle'}}
 
 hr
 

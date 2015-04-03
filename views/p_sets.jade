@@ -1,11 +1,18 @@
-p Filter:
-  input(ng-model='query')
+ol.breadcrumb
+  li.active Sets
 
-ul
-  li(ng-repeat='set in sets | filter:query')
-    img(style="max-width:92px;",ng-src="{{ ( ( set.art.thumb || set.thumbnail) | kodiImageToUrl) ||'defaultUrl' }}")
-    a(ng-href='sets/{{set.setid}}') {{set.label}} ({{set.setid}})
+.media(ng-repeat='set in sets | filter:query')
+  .media-left
+    a(ng-href='sets/{{set.setid}}')
+      img.media-object(style="max-width:92px;",ng-src="{{ ( ( set.art.thumb || set.thumbnail) | kodiImageToUrl) ||'defaultUrl' }}")
+  .media-body
+    .panel.panel-default
+      .panel-heading
+        a(ng-href='sets/{{set.setid}}')
+          h3.panel-title {{set.label}}
+            .pull-right ({{set.setid}})
+      .panel-body Blah blah
 
-hr
-
-pre {{ sets | json }}
+//
+  hr
+  pre {{ sets | json }}

@@ -80,6 +80,17 @@ app.get('/rest/movies/:id', function(req,res) {
 });
 
 
+app.post('/rest/movies/:movieid', function(req,res) {
+  kodi.call('VideoLibrary.SetMovieDetails', {
+    movieid: parseInt(req.params.movieid),
+    set: req.body.set
+  }, { path: '/jsonrpc' }, function(err, result) {
+    res.send(result);
+    res.end();
+  })
+});
+
+
 app.get('/rest/movies/search/:query', function(req,res) {
   kodi.call('VideoLibrary.GetMovies', {
     filter: {
