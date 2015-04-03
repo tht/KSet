@@ -4,8 +4,10 @@
 
 var kSetControllers = angular.module('kSetControllers', []);
 
-kSetControllers.controller('SetListCtrl', ['$scope', 'Set', function ($scope, Set) {
-    $scope.sets = Set.query();
+kSetControllers.controller('CollectionListCtrl', ['$scope', 'collection', function ($scope, collection) {
+    $scope.sets = collection.sets;
+    $scope.movies = collection.movies;
+    $scope.collection = collection.collection;
 }]);
 
 kSetControllers.controller('SetEditCtrl', ['$scope', 'Set', '$routeParams', '$http', function ($scope, Set, $routeParams, $http) {

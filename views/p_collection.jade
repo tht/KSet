@@ -1,0 +1,32 @@
+ol.breadcrumb
+  li.active Collection
+
+.media(ng-repeat='item in collection | filter:query | orderBy:"label"')
+  div(ng-if='item.movieid')
+    .media-left
+      a(ng-href='movies/{{item.movieid}}')
+        img.media-object(style="max-width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) ||'defaultUrl' }}")
+    .media-body
+      .panel.panel-default
+        .panel-heading
+          a(ng-href='movies/{{item.movieid}}')
+            h3.panel-title {{item.label}} ({{item.year}})
+              .pull-right ({{item.movieid}})
+        .panel-body(ng-bind="item.plot")
+  div(ng-if='!item.movieid')
+    .media-left
+      a(ng-href='sets/{{item.setid}}')
+        img.media-object(style="max-width:92px; width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) ||'defaultUrl' }}",title="{{item.thumbnail}}")
+    .media-body
+      .panel.panel-default
+        .panel-heading
+          a(ng-href='sets/{{item.setid}}')
+            h3.panel-title {{item.label}}
+              .pull-right ({{item.setid}})
+        .panel-body
+          ul
+            li(ng-repeat="movie in item.movies | orderBy:'label'")
+              a(ng-href="movies/{{movie.movieid}}") {{movie.label}} ({{movie.year}})
+
+hr
+pre {{ sets | json }}

@@ -5,17 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var rpc = require('json-rpc2');
-
-// Get all connection info from Environment variables
-var kodiPort = process.env.KODI_PORT || 8080,
-    kodiIP   = process.env.KODI_IP   || '127.0.0.1',
-    kodiUser = process.env.KODI_USER || 'kodi',
-    kodiPwd  = process.env.KODI_PWD  || 'kodi';
-
-var kodi = rpc.Client.$create(kodiPort, kodiIP, kodiUser, kodiPwd);
-
 var app = express();
+var Kodi = require('./kodi.js');
+var kodi = new Kodi({
+      kodiHost: process.env.KODI_HOST,
+      kodiPort: process.env.KODI_PORT,
+      kodiUser: process.env.KODI_USER,
+      kodiPwd: process.env.KODI_PWD
+    });
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,76 +32,7 @@ app.use(function(req,res,next) {
   next();
 });
 
-app.get('/rest/sets', function(req,res) {
-  kodi.call('VideoLibrary.GetMovieSets', {
-    properties: ['art', 'thumbnail'],
-    sort: { method: 'label', ignorearticle: true }
-  }, { path: '/jsonrpc' }, function(err, result) {
-    res.send(result.sets);
-    res.end();
-  })
-});
-
-app.get('/rest/sets/:id', function(req,res) {
-  kodi.call('VideoLibrary.GetMovieSetDetails', {
-    setid: parseInt(req.params.id),
-    movies: { properties: ['sorttitle', 'year', 'art', 'thumbnail'],
-      sort: { method: 'sorttitle', ignorearticle: true }
-    }
-  }, { 'path': '/jsonrpc' }, function(err, result) {
-    setDetails = result.setdetails;
-    delete setDetails.limits;
-    res.send(setDetails);
-    res.end();
-  })
-});
-
-app.get('/rest/movies', function(req,res) {
-  kodi.call('VideoLibrary.GetMovies', {
-    properties: [ 'sorttitle', 'year' ]
-  }, { path: '/jsonrpc' }, function(err, result) {
-    res.send(result.movies);
-    res.end();
-  })
-});
-
-app.get('/rest/movies/:id', function(req,res) {
-  kodi.call('VideoLibrary.GetMovieDetails', {
-    movieid: parseInt(req.params.id),
-    properties: [ 'sorttitle', 'year', 'set', 'file', 'setid' ]
-  }, { path: '/jsonrpc' }, function(err, result) {
-    movieDetails = result.moviedetails;
-    delete movieDetails.limits;
-    res.send(movieDetails);
-    res.end();
-  })
-});
-
-
-app.post('/rest/movies/:movieid', function(req,res) {
-  kodi.call('VideoLibrary.SetMovieDetails', {
-    movieid: parseInt(req.params.movieid),
-    set: req.body.set
-  }, { path: '/jsonrpc' }, function(err, result) {
-    res.send(result);
-    res.end();
-  })
-});
-
-
-app.get('/rest/movies/search/:query', function(req,res) {
-  kodi.call('VideoLibrary.GetMovies', {
-    filter: {
-      field: 'title', operator: 'contains', value: req.params.query
-    },
-    properties: [ 'sorttitle', 'year', 'set', 'file', 'setid', 'thumbnail', 'art' ]
-  }, { path: '/jsonrpc' }, function(err, result) {
-    res.send(result.movies);
-    res.end();
-  })
-});
-
-
+kodi.registerRoutes(app);
 
 app.get('/view/:name', function(req,res) {
   res.render(req.params.name);
