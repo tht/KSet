@@ -1,22 +1,23 @@
 ol.breadcrumb
   li.active Collection
 
-.media(ng-repeat='item in collection | filter:query | orderBy:"label"')
+.media(ng-repeat='item in collection | filter:collectionFilter | orderBy:kodiSortValue')
   div(ng-if='item.movieid')
     .media-left
       a(ng-href='movies/{{item.movieid}}')
-        img.media-object(style="max-width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) ||'defaultUrl' }}")
+        img.media-object(style="max-width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) || '/pics/poster_placeholder.jpg' }}")
     .media-body
       .panel.panel-default
         .panel-heading
           a(ng-href='movies/{{item.movieid}}')
             h3.panel-title {{item.label}} ({{item.year}})
               .pull-right ({{item.movieid}})
-        .panel-body(ng-bind="item.plot")
+        .panel-body
+          p {{item.plot}}
   div(ng-if='!item.movieid')
     .media-left
       a(ng-href='sets/{{item.setid}}')
-        img.media-object(style="max-width:92px; width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) ||'defaultUrl' }}",title="{{item.thumbnail}}")
+        img.media-object(style="max-width:92px; width:92px;",ng-src="{{ ( item.thumbnail | kodiImageToUrl) || '/pics/poster_placeholder.jpg' }}",title="{{item.thumbnail}}")
     .media-body
       .panel.panel-default
         .panel-heading
@@ -25,8 +26,10 @@ ol.breadcrumb
               .pull-right ({{item.setid}})
         .panel-body
           ul
-            li(ng-repeat="movie in item.movies | orderBy:'label'")
+            li(ng-repeat="movie in item.movies | orderBy:kodiSortValue")
               a(ng-href="movies/{{movie.movieid}}") {{movie.label}} ({{movie.year}})
+              i {{movie.sorttitle}}
 
-hr
-pre {{ sets | json }}
+//
+  hr
+  pre {{ sets | json }}

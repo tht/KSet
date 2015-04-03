@@ -32,10 +32,10 @@ kSetFilters.filter('kodiImageToUrl', function($resource) {
                 return url;
             } else {
                 // Todo: Find a way to get files for 'smb' URL
-                return '';
+                return null;
             }
         } else {
-            return '';
+            return null;
         }
 
         return "TEST" + input + "TEST";
