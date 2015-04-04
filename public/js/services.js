@@ -10,13 +10,13 @@ var kSetServices = angular.module('kSetServices', ['ngResource']);
 
 kSetServices.factory('Set', ['$resource',
     function($resource) {
-        return $resource('rest/sets/:setId');
+        return $resource('rest/sets/:setid', {setid: '@setid'});
     }]);
 
 
 kSetServices.factory('Movie', ['$resource',
     function($resource) {
-        return $resource('rest/movies/:movieId');
+        return $resource('rest/movies/:movieid');
     }]);
 
 kSetServices.factory('Collection', ['Movie', 'Set', '$q',

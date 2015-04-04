@@ -22,7 +22,7 @@ ol.breadcrumb
       .panel.panel-default
         .panel-heading
           a(ng-href='sets/{{item.setid}}')
-            h3.panel-title {{item.label}}
+            h3.panel-title {{item.label}} ({{item.movies.length}} {{item.movies.length == 1 ? "movie" : "movies"}})
               .pull-right ({{item.setid}})
         .panel-body
           ul

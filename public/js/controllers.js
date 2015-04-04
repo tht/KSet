@@ -35,14 +35,12 @@ kSetControllers.controller('CollectionListCtrl', ['$scope', 'collection', functi
     };
 }]);
 
-kSetControllers.controller('SetEditCtrl', ['$scope', 'Set', '$routeParams', '$http', function ($scope, Set, $routeParams, $http) {
-    $scope.set = Set.get({setId: parseInt($routeParams.setId) });
-
+kSetControllers.controller('SetEditCtrl', ['$scope', 'set', '$location', '$http', function ($scope, set, $location, $http) {
+    $scope.set = set;
+    console.log(set);
     $scope.removeSet = function() {
-        $scope.set.movies.forEach(function (movie) {
-            $http.post('/rest/movies/' + movie.movieid, {
-                set: ''
-            });
+        set.$remove(function() {
+            $location.path('/collection');
         });
     }
 }]);

@@ -21,9 +21,14 @@ kSetApp.config(['$routeProvider', '$locationProvider',
                     }
                 }
             }).
-            when('/sets/:setId', {
+            when('/sets/:setid', {
                 templateUrl: '/view/p_set',
-                controller: 'SetEditCtrl'
+                controller: 'SetEditCtrl',
+                resolve: {
+                    set: function(Set, $route) {
+                        return Set.get({setid: parseInt($route.current.params.setid)}).$promise;
+                    }
+                }
             }).
             otherwise({
                 redirectTo: '/collection'

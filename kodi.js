@@ -3,6 +3,7 @@
  */
 
 var rpc = require('json-rpc2');
+var async = require('async');
 
 var movieProps = [ 'sorttitle', 'year', 'plot', 'set', 'setid', 'thumbnail', 'fanart', 'file' ];
 var setProps = ['art', 'thumbnail'];
@@ -49,7 +50,7 @@ module.exports = function(conf) {
             })
         });
 
-        // Update ONE Movies
+        // Update ONE Movie
         app.post('/rest/movies/:movieid', function(req,res) {
             kodi.call('VideoLibrary.SetMovieDetails', {
                 movieid: parseInt(req.params.movieid),
@@ -85,6 +86,54 @@ module.exports = function(conf) {
             })
         });
 
+        // Remove ONE Set (by assigning an empty set to all movies)
+        app.delete('/rest/sets/:id', function(req,res, next) {
+            kodi.call('VideoLibrary.GetMovieSetDetails', {
+                setid: parseInt(req.params.id)
+            }, { 'path': '/jsonrpc' }, function(err, result) {
+
+                async.forEach(result.setdetails.movies, function(movie, callback) {
+
+                    kodi.call('VideoLibrary.SetMovieDetails', {
+                        movieid: movie.movieid,
+                        set: ''
+                    }, { path: '/jsonrpc' }, function(err, result) {
+                        callback();
+                    });
+
+                }, function(err) {
+                    if (err) return next(err);
+
+                    console.log("All done!");
+                });
+
+                res.end();
+            });
+
+/*
+
+            kodi.call('VideoLibrary.GetMovies', {
+                filter: {
+                    field: 'setid', operator: 'is', value: req.params.query
+                },
+            }, { path: '/jsonrpc' }, function(err, result) {
+                res.send(result.movies);
+                res.end();
+            });
+
+
+            kodi.call('VideoLibrary.GetMovieSetDetails', {
+                setid: parseInt(req.params.id),
+                movies: { properties: movieProps }
+            }, { 'path': '/jsonrpc' }, function(err, result) {
+                setDetails = result.setdetails;
+                delete setDetails.limits;
+                res.send(setDetails);
+                res.end();
+            });
+
+            */
+        });
 
 
     }
